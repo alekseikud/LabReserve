@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LabReserve · Laboratory workspace</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body class="container">
+  <header>
+    <h1>LabReserve</h1>
+    <p>University laboratory equipment reservations</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>About the project</h2>
+      <p>This application will help students find laboratory equipment and book a time to use it.</p>
+      <p>Equipment browsing and reservations are coming later.</p>
+    </section>
+
+    <section>
+      <h2>Connection status</h2>
+      <p id="connection-detail">Checking the workspace connection…</p>
+      <p>Status: <strong id="connection-status" data-state="checking" role="status" aria-live="polite">Checking…</strong></p>
+      <button id="retry" type="button">Check again</button>
+    </section>
+  </main>
+
+  <footer>LabReserve — project foundation</footer>
+</body>
+</html>

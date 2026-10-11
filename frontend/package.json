@@ -1,0 +1,12 @@
+{
+  "name": "labreserve-frontend-checks",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Browser checks for the static LabReserve frontend",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0"
+  }
+}
