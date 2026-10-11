@@ -1,0 +1,7 @@
+# Resolved versions verified in the backend image.
+Django==5.2.18
+asgiref==3.12.1
+gunicorn==25.3.0
+packaging==26.3
+psycopg[binary]==3.3.6
+sqlparse==0.6.0
