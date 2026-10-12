@@ -1,6 +1,5 @@
-// Intentional stage 2 exercise: the browser cannot resolve a Compose service name.
-// The next commit replaces this with a same-origin URL and an Nginx proxy.
-const HEALTH_URL = "http://backend:8000/api/health";
+// Nginx forwards same-origin API requests to the backend on the Docker network.
+const HEALTH_URL = "/api/health";
 
 const status = document.querySelector("#connection-status");
 const detail = document.querySelector("#connection-detail");
