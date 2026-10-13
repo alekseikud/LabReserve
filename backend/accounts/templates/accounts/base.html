@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}LabReserve{% endblock %}</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="container">
+  <header><h1>LabReserve</h1><p>University laboratory equipment reservations</p></header>
+  <nav aria-label="Main navigation">
+    <a href="/">Home</a>
+    {% if user.is_authenticated %}<a href="{% url 'dashboard' %}">My account</a>{% else %}<a href="{% url 'login' %}">Log in</a>{% endif %}
+  </nav>
+  <main><section>{% block content %}{% endblock %}</section></main>
+</body>
+</html>

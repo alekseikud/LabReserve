@@ -89,6 +89,14 @@ footer {
   font-size: 14px;
 }
 
+nav { margin-top: 16px; }
+nav a { margin-right: 16px; }
+a { color: #244d73; }
+input { display: block; width: 100%; max-width: 400px; padding: 10px; font: inherit; }
+label { display: block; font-weight: bold; }
+.errorlist { color: #b3261e; padding-left: 20px; }
+.helptext { display: block; color: #58636d; font-size: 14px; }
+
 @media (max-width: 600px) {
   .container {
     margin: 16px auto;

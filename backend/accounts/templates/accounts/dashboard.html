@@ -1,0 +1,9 @@
+{% extends "accounts/base.html" %}
+{% block title %}My account | LabReserve{% endblock %}
+{% block content %}
+<h2>My account</h2>
+<p>Signed in as <strong>{{ user.username }}</strong>.</p>
+<p>Role: {{ user.get_role_display }}</p>
+<p>Equipment browsing and reservations are coming later.</p>
+<form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Log out</button></form>
+{% endblock %}

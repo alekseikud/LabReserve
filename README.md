@@ -5,8 +5,8 @@ A university project for booking laboratory equipment.
 Uses Django, PostgreSQL and a simple HTML/CSS/JavaScript frontend.
 The project idea is in [docs/proposal.md](docs/proposal.md).
 
-Currently, the database, backend health check and frontend page work.
-Login and reservations are not implemented yet.
+The database, frontend, health check and session login/logout work.
+Equipment browsing and reservations are not implemented yet.
 
 Django handles users and authentication. Laboratory, equipment and reservation
 tables are defined in `backend/sql/001_initial.sql`. Startup runs Django migrations
