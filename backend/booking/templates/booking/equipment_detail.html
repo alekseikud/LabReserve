@@ -1,0 +1,10 @@
+{% extends "accounts/base.html" %}
+{% block content %}
+<h2>{{ equipment.name }}</h2>
+<p>Asset tag: {{ equipment.asset_tag }}</p>
+<p>Laboratory: {{ equipment.laboratory }}</p>
+<p>Category: {{ equipment.category }}</p>
+<p>Status: {{ equipment.status }}</p>
+<p>{{ equipment.description }}</p>
+<p><a href="{% url 'equipment_list' %}">Back to equipment</a></p>
+{% endblock %}

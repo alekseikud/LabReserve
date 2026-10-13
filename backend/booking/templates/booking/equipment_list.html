@@ -1,0 +1,12 @@
+{% extends "accounts/base.html" %}
+{% block content %}
+<h2>Equipment</h2>
+<form method="get">{{ form.as_p }}<button type="submit">Filter</button> <a href="{% url 'equipment_list' %}">Clear filters</a></form>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>Asset tag</th><th>Laboratory</th><th>Category</th><th>Status</th></tr></thead>
+<tbody>{% for item in page %}<tr>
+<td><a href="{% url 'equipment_detail' item.id %}">{{ item.name }}</a></td><td>{{ item.asset_tag }}</td><td>{{ item.laboratory }}</td><td>{{ item.category }}</td><td>{{ item.status }}</td>
+</tr>{% empty %}<tr><td colspan="5">No equipment found.</td></tr>{% endfor %}</tbody>
+</table></div>
+{% include "booking/pagination.html" %}
+{% endblock %}

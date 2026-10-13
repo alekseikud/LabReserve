@@ -96,6 +96,12 @@ input { display: block; width: 100%; max-width: 400px; padding: 10px; font: inhe
 label { display: block; font-weight: bold; }
 .errorlist { color: #b3261e; padding-left: 20px; }
 .helptext { display: block; color: #58636d; font-size: 14px; }
+select, textarea { display: block; width: 100%; max-width: 400px; padding: 10px; font: inherit; }
+input[type="checkbox"] { display: inline; width: auto; }
+.table-scroll { overflow-x: auto; margin-top: 20px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 10px; border-bottom: 1px solid #d6dce2; }
+td { overflow-wrap: anywhere; }
 
 @media (max-width: 600px) {
   .container {

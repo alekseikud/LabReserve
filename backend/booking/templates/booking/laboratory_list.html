@@ -1,0 +1,12 @@
+{% extends "accounts/base.html" %}
+{% block content %}
+<h2>Laboratories</h2>
+<form method="get">{{ form.as_p }}<button type="submit">Filter</button> <a href="{% url 'laboratory_list' %}">Clear filters</a></form>
+<div class="table-scroll"><table>
+<thead><tr><th>Code</th><th>Name</th><th>Location</th><th>Equipment</th></tr></thead>
+<tbody>{% for lab in page %}<tr><td>{{ lab.code }}</td><td>{{ lab.name }}</td><td>{{ lab.location }}</td>
+<td><a href="{% url 'equipment_list' %}?laboratory={{ lab.id }}">{{ lab.equipment_count }} items</a></td></tr>
+{% empty %}<tr><td colspan="4">No laboratories found.</td></tr>{% endfor %}</tbody>
+</table></div>
+{% include "booking/pagination.html" %}
+{% endblock %}

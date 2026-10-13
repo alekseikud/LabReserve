@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "accounts",
     "core",
+    "booking",
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
