@@ -20,6 +20,7 @@ ENV = {
     "POSTGRES_PASSWORD": "disposable-test-password",
     "DJANGO_SECRET_KEY": "disposable-test-key-not-for-deployment",
     "DJANGO_ALLOWED_HOSTS": "localhost,127.0.0.1,backend",
+    "EMAIL_BACKEND": "django.core.mail.backends.console.EmailBackend",
 }
 COMPOSE = [
     "docker", "compose", "--env-file", str(ROOT / ".env.example"),
@@ -115,8 +116,14 @@ def verify():
     wait_health(base, 200, {"status": "ok"})
     print("PASS: data persists across removal and recreation of all containers", flush=True)
 
-    run(["npm", "test", "--prefix", "frontend"], env={**ENV, "BASE_URL": base})
-    print("PASS: browser connection, recovery, and responsive shell tests", flush=True)
+    # These accounts exist only in the disposable verification database.
+    password = uuid4().hex
+    compose("exec", "-T", "-e", f"AUTH_TEST_PASSWORD={password}", "backend", "python", "manage.py", "shell", "-c",
+            "import os; from accounts.models import User; "
+            "[User.objects.create_user('browser-' + role, role + '@example.test', "
+            "os.environ['AUTH_TEST_PASSWORD'], role=role) for role in User.Role.values]")
+    run(["npm", "test", "--prefix", "frontend"], env={**ENV, "BASE_URL": base, "AUTH_TEST_PASSWORD": password})
+    print("PASS: browser authentication, permissions, reset forms and connection tests", flush=True)
 
 
 if __name__ == "__main__":

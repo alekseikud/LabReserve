@@ -1,0 +1,6 @@
+{% extends "accounts/base.html" %}
+{% block content %}
+<h2>{{ heading }}</h2>
+<p>{{ description }}</p>
+<p><a href="{% url 'dashboard' %}">Back to my account</a></p>
+{% endblock %}

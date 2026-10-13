@@ -5,7 +5,7 @@ A university project for booking laboratory equipment.
 Uses Django, PostgreSQL and a simple HTML/CSS/JavaScript frontend.
 The project idea is in [docs/proposal.md](docs/proposal.md).
 
-The database, frontend, health check and session login/logout work.
+The database, frontend, health check, login/logout, password reset and role access work.
 Equipment browsing and reservations are not implemented yet.
 
 Django handles users and authentication. Laboratory, equipment and reservation
@@ -31,6 +31,22 @@ are printed by `docker compose logs backend`, not delivered to an inbox.
 The reset link expires after one hour. For real email delivery, configure the
 SMTP settings shown in `.env.example` and recreate the backend container.
 Do not share backend logs containing reset links.
+
+## Accounts
+
+Create accounts from the terminal (the password is prompted, not stored in a command):
+
+```sh
+docker compose exec backend python manage.py create_account student student@example.test
+docker compose exec backend python manage.py create_account manager manager@example.test --role manager
+docker compose exec backend python manage.py create_account administrator admin@example.test --role admin
+```
+
+Open http://localhost:8080/accounts/login/. Students can access their account page;
+managers also get the manager area; administrators get both management areas.
+The management areas are placeholders with real permission checks, not CRUD pages yet.
+There is no public registration. Use a real email address when testing SMTP delivery.
+The current local setup uses HTTP; configure HTTPS and secure cookies before public deployment.
 
 ## Tests
 

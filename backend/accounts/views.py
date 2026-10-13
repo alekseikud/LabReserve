@@ -4,6 +4,9 @@ from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET
 
+from .models import User
+from .permissions import roles_required
+
 
 @never_cache
 @login_required
@@ -18,3 +21,23 @@ def current_user(request):
     if not request.user.is_authenticated:
         return JsonResponse({"error": "Login required"}, status=401)
     return JsonResponse({"username": request.user.username, "role": request.user.role})
+
+
+@never_cache
+@roles_required(User.Role.MANAGER, User.Role.ADMIN)
+@require_GET
+def manager_page(request):
+    return render(request, "accounts/role_page.html", {
+        "heading": "Laboratory manager area",
+        "description": "Equipment management and reservation approval will be added here later.",
+    })
+
+
+@never_cache
+@roles_required(User.Role.ADMIN)
+@require_GET
+def administrator_page(request):
+    return render(request, "accounts/role_page.html", {
+        "heading": "Administrator area",
+        "description": "User and laboratory management will be added here later.",
+    })
