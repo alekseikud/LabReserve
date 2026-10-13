@@ -26,6 +26,12 @@ docker compose up -d --build --wait
 Open http://localhost:8080. Stop with `docker compose down`.
 Database data is kept unless you add `-v`.
 
+Password reset is available from the login page. In local development, emails
+are printed by `docker compose logs backend`, not delivered to an inbox.
+The reset link expires after one hour. For real email delivery, configure the
+SMTP settings shown in `.env.example` and recreate the backend container.
+Do not share backend logs containing reset links.
+
 ## Tests
 
 Backend: `docker compose exec backend python manage.py test tests`.
