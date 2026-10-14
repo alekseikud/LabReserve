@@ -6,5 +6,9 @@
 <p>Category: {{ equipment.category }}</p>
 <p>Status: {{ equipment.status }}</p>
 <p>{{ equipment.description }}</p>
+{% if equipment.status == 'available' %}<p><a href="{% url 'reservation_create' equipment.id %}">Reserve this equipment</a></p>{% endif %}
+<h3>Upcoming occupied slots</h3>
+<p>Times use Europe/Warsaw local time.</p>
+<ul>{% for slot in slots %}<li>{{ slot.starts_at|date:"Y-m-d H:i" }} – {{ slot.ends_at|date:"Y-m-d H:i" }} ({{ slot.status }})</li>{% empty %}<li>No upcoming reservations.</li>{% endfor %}</ul>
 <p><a href="{% url 'equipment_list' %}">Back to equipment</a></p>
 {% endblock %}

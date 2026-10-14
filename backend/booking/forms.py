@@ -1,4 +1,5 @@
 from django import forms
+from django.utils import timezone
 
 from .db import laboratories
 
@@ -19,3 +20,26 @@ class EquipmentFilter(forms.Form):
 class LaboratoryFilter(forms.Form):
     q = forms.CharField(label="Code or name", max_length=100, required=False)
     location = forms.CharField(max_length=160, required=False)
+
+
+RESERVATION_STATUSES = [(value, value.title()) for value in ("pending", "approved", "rejected", "cancelled")]
+
+
+class ReservationForm(forms.Form):
+    purpose = forms.CharField(max_length=500, widget=forms.Textarea(attrs={"rows": 3}))
+    starts_at = forms.DateTimeField(label="Start", widget=forms.DateTimeInput(attrs={"type": "datetime-local"}))
+    ends_at = forms.DateTimeField(label="End", widget=forms.DateTimeInput(attrs={"type": "datetime-local"}))
+
+    def clean(self):
+        data = super().clean()
+        start, end = data.get("starts_at"), data.get("ends_at")
+        if start and start <= timezone.now():
+            self.add_error("starts_at", "Choose a future start time.")
+        if start and end and end <= start:
+            self.add_error("ends_at", "End must be after start.")
+        return data
+
+
+class ReservationFilter(forms.Form):
+    status = forms.ChoiceField(required=False, choices=[("", "All statuses")] + RESERVATION_STATUSES)
+    q = forms.CharField(label="Equipment name", max_length=100, required=False)

@@ -1,0 +1,6 @@
+{% extends "accounts/base.html" %}
+{% block content %}
+<h2>{{ heading }}</h2>
+<p>Reservation times use Europe/Warsaw local time.</p>
+<form method="post">{% csrf_token %}{{ form.as_p }}<button type="submit">{{ button|default:"Save" }}</button></form>
+{% endblock %}
