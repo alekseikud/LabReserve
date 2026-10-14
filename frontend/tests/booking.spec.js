@@ -68,6 +68,21 @@ test("administrator setup, manager equipment and student booking lifecycle", asy
   await reserve();
   await expect(page.locator(".errorlist")).toContainText("overlaps");
 
+  await login(page, "admin");
+  await page.goto("/workspace/manage/reservations/");
+  const actions = page.getByRole("row").filter({ hasText: purpose }).locator(".reservation-actions button");
+  await expect(actions).toHaveCount(3);
+  const boxes = await actions.evaluateAll(buttons => buttons.map(button => {
+    const box = button.getBoundingClientRect();
+    return { x: box.x, y: box.y, width: box.width, height: box.height };
+  }));
+  for (let i = 1; i < boxes.length; i++) {
+    expect(boxes[i].x).toBe(boxes[0].x);
+    expect(boxes[i].width).toBe(boxes[0].width);
+    expect(boxes[i].y - boxes[i - 1].y - boxes[i - 1].height).toBeGreaterThanOrEqual(8);
+  }
+  await page.screenshot({ path: info.outputPath("review-actions.png"), fullPage: true });
+
   await login(page, "manager");
   await page.goto("/workspace/manage/reservations/");
   await page.getByRole("row").filter({ hasText: purpose }).getByRole("button", { name: "Approve", exact: true }).click();
