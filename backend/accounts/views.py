@@ -29,7 +29,8 @@ def current_user(request):
 def manager_page(request):
     return render(request, "accounts/role_page.html", {
         "heading": "Laboratory manager area",
-        "description": "Equipment management and reservation approval will be added here later.",
+        "description": "Manage equipment and review reservations for your assigned laboratories.",
+        "manager_area": True,
     })
 
 

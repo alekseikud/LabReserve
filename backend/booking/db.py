@@ -21,3 +21,13 @@ def one(statement, params=()):
 
 def laboratories():
     return query("SELECT * FROM inventory_laboratory ORDER BY code")
+
+
+def managed_laboratories(user):
+    if user.role == "admin":
+        return laboratories()
+    if user.role != "manager":
+        return []
+    return query("""SELECT l.* FROM inventory_laboratory l
+                    JOIN inventory_laboratory_managers m ON m.laboratory_id = l.id
+                    WHERE m.user_id = %s ORDER BY l.code""", [user.pk])

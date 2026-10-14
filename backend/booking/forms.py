@@ -1,7 +1,7 @@
 from django import forms
 from django.utils import timezone
 
-from .db import laboratories
+from .db import laboratories, managed_laboratories
 
 EQUIPMENT_STATUSES = [(value, value.title()) for value in ("available", "maintenance", "retired")]
 
@@ -43,3 +43,16 @@ class ReservationForm(forms.Form):
 class ReservationFilter(forms.Form):
     status = forms.ChoiceField(required=False, choices=[("", "All statuses")] + RESERVATION_STATUSES)
     q = forms.CharField(label="Equipment name", max_length=100, required=False)
+
+
+class EquipmentForm(forms.Form):
+    laboratory_id = forms.TypedChoiceField(label="Laboratory", coerce=int)
+    asset_tag = forms.CharField(max_length=40)
+    name = forms.CharField(max_length=120)
+    category = forms.CharField(max_length=80)
+    description = forms.CharField(required=False, max_length=5000, widget=forms.Textarea(attrs={"rows": 3}))
+    status = forms.ChoiceField(choices=EQUIPMENT_STATUSES)
+
+    def __init__(self, *args, user, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["laboratory_id"].choices = [(lab["id"], lab["code"]) for lab in managed_laboratories(user)]

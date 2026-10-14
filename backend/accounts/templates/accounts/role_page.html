@@ -2,5 +2,6 @@
 {% block content %}
 <h2>{{ heading }}</h2>
 <p>{{ description }}</p>
+{% if manager_area %}<p><a href="{% url 'equipment_manage' %}">Manage equipment</a></p><p><a href="{% url 'reservation_review' %}">Review reservations</a></p>{% endif %}
 <p><a href="{% url 'dashboard' %}">Back to my account</a></p>
 {% endblock %}

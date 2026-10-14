@@ -1,0 +1,9 @@
+{% extends "accounts/base.html" %}
+{% block content %}
+<h2>Manage equipment</h2>
+{% if labs %}<p><a href="{% url 'equipment_create' %}">Add equipment</a></p>{% else %}<p>No laboratories are assigned to you. Ask an administrator to assign one.</p>{% endif %}
+<div class="table-scroll"><table><thead><tr><th>Name</th><th>Laboratory</th><th>Status</th><th>Action</th></tr></thead>
+<tbody>{% for item in page %}<tr><td>{{ item.name }}</td><td>{{ item.laboratory }}</td><td>{{ item.status }}</td><td><a href="{% url 'equipment_edit' item.id %}">Edit</a></td></tr>
+{% empty %}<tr><td colspan="4">No equipment found.</td></tr>{% endfor %}</tbody></table></div>
+{% include "booking/pagination.html" %}
+{% endblock %}

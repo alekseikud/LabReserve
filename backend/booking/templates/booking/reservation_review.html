@@ -1,0 +1,14 @@
+{% extends "accounts/base.html" %}
+{% block content %}
+<h2>Review reservations</h2>
+<p>Only requests for your laboratories are shown. Times use Europe/Warsaw.</p>
+<form method="get">{{ form.as_p }}<button type="submit">Filter</button></form>
+<div class="table-scroll"><table><thead><tr><th>Equipment / lab</th><th>Owner / purpose</th><th>Time</th><th>Status</th><th>Action</th></tr></thead>
+<tbody>{% for item in page %}<tr><td>{{ item.equipment }} / {{ item.laboratory }}</td><td>{{ item.owner }} / {{ item.purpose }}</td>
+<td>{{ item.starts_at|date:"Y-m-d H:i" }} – {{ item.ends_at|date:"Y-m-d H:i" }}</td><td>{{ item.status }}</td>
+<td><form method="post" action="{% url 'reservation_decide' item.id %}">{% csrf_token %}
+{% if item.status == 'pending' %}<button name="decision" value="approved">Approve</button> <button name="decision" value="rejected">Reject</button>{% endif %}
+{% if item.can_cancel %}<button name="decision" value="cancelled">Cancel</button>{% endif %}
+</form></td></tr>{% empty %}<tr><td colspan="5">No reservations found.</td></tr>{% endfor %}</tbody></table></div>
+{% include "booking/pagination.html" %}
+{% endblock %}
