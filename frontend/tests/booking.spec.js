@@ -1,4 +1,5 @@
 const { test, expect } = require("@playwright/test");
+const { reportScreenshot } = require("./report-screenshots");
 
 async function expectFits(page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -18,6 +19,8 @@ test("administrator setup, manager equipment and student booking lifecycle", asy
   const suffix = info.project.name;
   const equipment = `Test scope ${suffix}`;
   const purpose = `Practical class ${suffix}`;
+  await page.goto("/accounts/login/");
+  await reportScreenshot(page, info, "login");
   await login(page, "admin");
   await page.goto("/workspace/admin/laboratories/new/");
   await expectFits(page);
@@ -28,6 +31,7 @@ test("administrator setup, manager equipment and student booking lifecycle", asy
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Manage laboratories" })).toBeVisible();
   await expectFits(page);
+  await reportScreenshot(page, info, "laboratory-management");
 
   await page.goto("/workspace/admin/users/new/");
   await expectFits(page);
@@ -39,6 +43,7 @@ test("administrator setup, manager equipment and student booking lifecycle", asy
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Manage users" })).toBeVisible();
   await expectFits(page);
+  await reportScreenshot(page, info, "user-management");
   await page.getByRole("row").filter({ hasText: `new-${suffix}@example.test` }).getByRole("link", { name: "Edit", exact: true }).click();
   await expectFits(page);
   await page.getByLabel("Active:", { exact: true }).uncheck();
@@ -68,6 +73,7 @@ test("administrator setup, manager equipment and student booking lifecycle", asy
   await expect(page.locator("tbody tr")).toHaveCount(1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: info.outputPath("equipment.png"), fullPage: true });
+  await reportScreenshot(page, info, "equipment");
   await page.getByRole("link", { name: equipment, exact: true }).click();
   const detailUrl = page.url();
   const day = new Date(Date.now() + 2 * 86400000).toISOString().slice(0, 10);
@@ -78,6 +84,7 @@ test("administrator setup, manager equipment and student booking lifecycle", asy
     await page.getByLabel("Purpose:", { exact: true }).fill(purpose);
     await page.getByLabel("Start:", { exact: true }).fill(`${day}T10:00`);
     await page.getByLabel("End:", { exact: true }).fill(`${day}T11:00`);
+    await reportScreenshot(page, info, "reservation-form");
     await page.getByRole("button", { name: "Request reservation" }).click();
   }
   await reserve();
@@ -104,6 +111,7 @@ test("administrator setup, manager equipment and student booking lifecycle", asy
 
   await login(page, "manager");
   await page.goto("/workspace/manage/reservations/");
+  await reportScreenshot(page, info, "reservation-review");
   await page.getByRole("row").filter({ hasText: purpose }).getByRole("button", { name: "Approve", exact: true }).click();
   await expect(page.getByRole("row").filter({ hasText: purpose })).toContainText("approved");
   await page.screenshot({ path: info.outputPath("review.png"), fullPage: true });
@@ -114,6 +122,7 @@ test("administrator setup, manager equipment and student booking lifecycle", asy
   await expect(page.getByRole("row").filter({ hasText: purpose })).toContainText("cancelled");
   await reserve();
   await expect(page.getByRole("row").filter({ hasText: purpose }).filter({ hasText: "pending" })).toHaveCount(1);
+  await reportScreenshot(page, info, "reservation-history");
 
   await login(page, "manager");
   await page.goto("/workspace/manage/reservations/");
