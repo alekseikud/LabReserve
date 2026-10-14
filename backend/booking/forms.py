@@ -1,5 +1,8 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
 from django.utils import timezone
+
+from accounts.models import User
 
 from .db import laboratories, managed_laboratories
 
@@ -56,3 +59,35 @@ class EquipmentForm(forms.Form):
     def __init__(self, *args, user, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["laboratory_id"].choices = [(lab["id"], lab["code"]) for lab in managed_laboratories(user)]
+
+
+class LaboratoryForm(forms.Form):
+    code = forms.CharField(max_length=24)
+    name = forms.CharField(max_length=120)
+    location = forms.CharField(max_length=160)
+    managers = forms.ModelMultipleChoiceField(queryset=User.objects.none(), required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["managers"].queryset = User.objects.filter(role="manager", is_active=True).order_by("username")
+        self.fields["managers"].help_text = "Select active laboratory managers. Hold Ctrl or Command to select more than one."
+
+
+class UserEditForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["username", "email", "role", "is_active"]
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        if not email:
+            raise forms.ValidationError("Email is required for password reset.")
+        return email
+
+
+class UserCreateForm(UserCreationForm):
+    email = forms.EmailField()
+
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ["username", "email", "role"]

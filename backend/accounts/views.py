@@ -40,5 +40,6 @@ def manager_page(request):
 def administrator_page(request):
     return render(request, "accounts/role_page.html", {
         "heading": "Administrator area",
-        "description": "User and laboratory management will be added here later.",
+        "description": "Manage users, laboratories and laboratory assignments.",
+        "admin_area": True,
     })
