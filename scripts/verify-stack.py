@@ -123,7 +123,7 @@ def verify():
             "[User.objects.create_user('browser-' + role, role + '@example.test', "
             "os.environ['AUTH_TEST_PASSWORD'], role=role) for role in User.Role.values]")
     run(["npm", "test", "--prefix", "frontend"], env={**ENV, "BASE_URL": base, "AUTH_TEST_PASSWORD": password})
-    print("PASS: browser authentication, permissions, reset forms and connection tests", flush=True)
+    print("PASS: browser authentication, booking lifecycle, management and connection tests", flush=True)
 
 
 if __name__ == "__main__":

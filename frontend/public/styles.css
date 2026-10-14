@@ -99,9 +99,9 @@ label { display: block; font-weight: bold; }
 select, textarea { display: block; width: 100%; max-width: 400px; padding: 10px; font: inherit; }
 input[type="checkbox"] { display: inline; width: auto; }
 .table-scroll { overflow-x: auto; margin-top: 20px; }
-table { width: 100%; border-collapse: collapse; }
+table { width: 100%; min-width: 640px; border-collapse: collapse; }
 th, td { text-align: left; padding: 10px; border-bottom: 1px solid #d6dce2; }
-td { overflow-wrap: anywhere; }
+td { min-width: 90px; max-width: 280px; overflow-wrap: break-word; }
 
 @media (max-width: 600px) {
   .container {
