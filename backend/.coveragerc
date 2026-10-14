@@ -1,0 +1,20 @@
+[run]
+branch = True
+source = accounts,booking,core,config
+omit = */migrations/*
+data_file = /tmp/labreserve.coverage
+relative_files = True
+
+[report]
+fail_under = 70
+show_missing = True
+precision = 2
+
+[html]
+directory = /tmp/labreserve-coverage/html
+
+[xml]
+output = /tmp/labreserve-coverage/coverage.xml
+
+[json]
+output = /tmp/labreserve-coverage/coverage.json

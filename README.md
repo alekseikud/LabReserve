@@ -85,3 +85,21 @@ npm test
 
 From the project folder, `python3 scripts/verify-stack.py` runs all checks
 in a separate temporary Docker setup.
+
+Verification also measures backend line and branch coverage and fails below 70%
+combined coverage. Reports are saved in `test-results/backend/`; open
+`test-results/backend/html/index.html` for details. The same check runs in GitHub
+Actions, which uploads the reports as an artifact.
+
+Coverage includes our `accounts`, `booking`, `core` and `config` Python packages.
+Generated Django migrations, test code and third-party libraries are excluded.
+HTML, CSS, SQL and JavaScript are checked through integration/browser tests,
+not included in the Python coverage percentage. Browser tests run at desktop
+(1440px), mobile (390px) and small-mobile (320px) widths.
+
+For just the backend coverage check on a running stack:
+
+```sh
+docker compose exec backend python -m coverage run manage.py test tests
+docker compose exec backend python -m coverage report
+```

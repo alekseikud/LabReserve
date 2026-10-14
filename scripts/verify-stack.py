@@ -94,10 +94,19 @@ def verify():
         ["apply_sql_schema", "--check"],
         ["apply_sql_schema"],  # A second application must leave data/schema intact.
         ["makemigrations", "--check", "--dry-run"],
-        ["test", "tests", "--verbosity", "2"],
     ]:
         compose("exec", "-T", "backend", "python", "manage.py", *command)
-    print("PASS: Django checks and PostgreSQL schema/health tests", flush=True)
+    try:
+        compose("exec", "-T", "backend", "python", "-m", "coverage", "run", "manage.py", "test", "tests", "--verbosity", "2")
+    finally:
+        # Keep reports even when tests or the coverage threshold fail.
+        for report_format in ["html", "xml", "json"]:
+            compose("exec", "-T", "backend", "python", "-m", "coverage", report_format, "--fail-under=0")
+        reports = ROOT / "test-results" / "backend"
+        reports.mkdir(parents=True, exist_ok=True)
+        compose("cp", "backend:/tmp/labreserve-coverage/.", str(reports))
+    compose("exec", "-T", "backend", "python", "-m", "coverage", "report")
+    print("PASS: backend tests and minimum 70% combined line/branch coverage", flush=True)
 
     compose("stop", "database")
     wait_health(base, 503, {"status": "unavailable"})

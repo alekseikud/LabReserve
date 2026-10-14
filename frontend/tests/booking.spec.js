@@ -1,11 +1,16 @@
 const { test, expect } = require("@playwright/test");
 
+async function expectFits(page) {
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+}
+
 async function login(page, role) {
   await page.goto("/accounts/login/");
   await page.getByLabel("Username:", { exact: true }).fill(`browser-${role}`);
   await page.getByLabel("Password:", { exact: true }).fill(process.env.AUTH_TEST_PASSWORD);
   await page.getByRole("button", { name: "Log in", exact: true }).click();
   await expect(page.getByRole("heading", { name: "My account", exact: true })).toBeVisible();
+  await expectFits(page);
 }
 
 test("administrator setup, manager equipment and student booking lifecycle", async ({ page }, info) => {
@@ -15,14 +20,17 @@ test("administrator setup, manager equipment and student booking lifecycle", asy
   const purpose = `Practical class ${suffix}`;
   await login(page, "admin");
   await page.goto("/workspace/admin/laboratories/new/");
+  await expectFits(page);
   await page.getByLabel("Code:", { exact: true }).fill(`FLOW-${suffix}`);
   await page.getByLabel("Name:", { exact: true }).fill(`Test laboratory ${suffix}`);
   await page.getByLabel("Location:", { exact: true }).fill("Building C");
   await page.getByLabel("Managers:", { exact: true }).selectOption({ label: "browser-manager" });
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Manage laboratories" })).toBeVisible();
+  await expectFits(page);
 
   await page.goto("/workspace/admin/users/new/");
+  await expectFits(page);
   await page.getByLabel("Username:", { exact: true }).fill(`new-${suffix}`);
   await page.getByLabel("Email:", { exact: true }).fill(`new-${suffix}@example.test`);
   await page.getByLabel("Role:", { exact: true }).selectOption("student");
@@ -30,13 +38,16 @@ test("administrator setup, manager equipment and student booking lifecycle", asy
   await page.getByLabel("Password confirmation:", { exact: true }).fill("Browser-new-password-53!");
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Manage users" })).toBeVisible();
+  await expectFits(page);
   await page.getByRole("row").filter({ hasText: `new-${suffix}@example.test` }).getByRole("link", { name: "Edit", exact: true }).click();
+  await expectFits(page);
   await page.getByLabel("Active:", { exact: true }).uncheck();
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await expect(page.getByRole("row").filter({ hasText: `new-${suffix}@example.test` })).toContainText("No");
 
   await login(page, "manager");
   await page.goto("/workspace/manage/equipment/new/");
+  await expectFits(page);
   await page.getByLabel("Laboratory:", { exact: true }).selectOption({ label: `FLOW-${suffix}` });
   await page.getByLabel("Asset tag:", { exact: true }).fill(`SCOPE-${suffix}`);
   await page.getByLabel("Name:", { exact: true }).fill(equipment);
@@ -44,8 +55,13 @@ test("administrator setup, manager equipment and student booking lifecycle", asy
   await page.getByLabel("Status:", { exact: true }).selectOption("available");
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Manage equipment" })).toBeVisible();
+  await expectFits(page);
 
   await login(page, "student");
+  await page.locator("strong").evaluate(element => { element.textContent = "u".repeat(150); });
+  await expectFits(page);
+  await page.goto("/workspace/laboratories/");
+  await expectFits(page);
   await page.goto("/workspace/equipment/");
   await page.getByLabel("Name or asset tag:", { exact: true }).fill(equipment);
   await page.getByRole("button", { name: "Filter", exact: true }).click();
@@ -58,6 +74,7 @@ test("administrator setup, manager equipment and student booking lifecycle", asy
   async function reserve() {
     await page.goto(detailUrl);
     await page.getByRole("link", { name: "Reserve this equipment" }).click();
+    await expectFits(page);
     await page.getByLabel("Purpose:", { exact: true }).fill(purpose);
     await page.getByLabel("Start:", { exact: true }).fill(`${day}T10:00`);
     await page.getByLabel("End:", { exact: true }).fill(`${day}T11:00`);
@@ -65,11 +82,13 @@ test("administrator setup, manager equipment and student booking lifecycle", asy
   }
   await reserve();
   await expect(page.getByRole("row").filter({ hasText: purpose })).toContainText("pending");
+  await expectFits(page);
   await reserve();
   await expect(page.locator(".errorlist")).toContainText("overlaps");
 
   await login(page, "admin");
   await page.goto("/workspace/manage/reservations/");
+  await expectFits(page);
   const actions = page.getByRole("row").filter({ hasText: purpose }).locator(".reservation-actions button");
   await expect(actions).toHaveCount(3);
   const boxes = await actions.evaluateAll(buttons => buttons.map(button => {

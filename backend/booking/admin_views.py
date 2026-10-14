@@ -1,3 +1,4 @@
+from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.cache import never_cache
@@ -59,6 +60,9 @@ def user_edit(request, pk=None):
     with transaction.atomic():
         if request.method == "POST":
             list(User.objects.select_for_update().filter(role="admin", is_active=True).order_by("pk"))
+            # Permissions may have changed while this request waited for the lock.
+            if not User.objects.filter(pk=request.user.pk, role="admin", is_active=True).exists():
+                raise PermissionDenied
         user = get_object_or_404(User, pk=pk) if pk else None
         form_class = UserEditForm if pk else UserCreateForm
         form = form_class(request.POST if request.method == "POST" else None, instance=user)
