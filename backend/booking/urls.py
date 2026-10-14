@@ -8,4 +8,5 @@ urlpatterns = [
     path("laboratories/", views.laboratory_list, name="laboratory_list"),
     path("equipment/<int:pk>/reserve/", views.reservation_create, name="reservation_create"),
     path("reservations/", views.reservation_list, name="reservation_list"),
+    path("reservations/<int:pk>/cancel/", views.reservation_cancel, name="reservation_cancel"),
 ]

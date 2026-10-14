@@ -1,8 +1,8 @@
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 
-from .db import one
+from .db import one, query
 
 
 def create_reservation(user, equipment_id, data):
@@ -21,3 +21,13 @@ def create_reservation(user, equipment_id, data):
         if getattr(getattr(error.__cause__, "diag", None), "constraint_name", None) == "reservation_no_overlap":
             raise ValidationError("This time overlaps an existing reservation. Choose another time.") from error
         raise
+
+
+@transaction.atomic
+def cancel_reservation(user, pk):
+    reservation = one("SELECT * FROM reservations_reservation WHERE id = %s FOR UPDATE", [pk])
+    if reservation["owner_id"] != user.pk and user.role != "admin":
+        raise PermissionDenied
+    if reservation["status"] not in ("pending", "approved") or reservation["starts_at"] <= timezone.now():
+        raise ValidationError("Only future pending or approved reservations can be cancelled.")
+    query("UPDATE reservations_reservation SET status = 'cancelled' WHERE id = %s", [pk])

@@ -1,0 +1,6 @@
+{% extends "accounts/base.html" %}
+{% block content %}
+<h2>Action not completed</h2>
+<p>{{ error }}</p>
+<p><a href="{% url 'reservation_list' %}">My reservations</a> · <a href="{% url 'dashboard' %}">My account</a></p>
+{% endblock %}

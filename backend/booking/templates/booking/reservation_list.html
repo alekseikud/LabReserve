@@ -4,10 +4,11 @@
 <p>Times use Europe/Warsaw local time. Pending requests also block their time slots.</p>
 <form method="get">{{ form.as_p }}<button type="submit">Filter</button> <a href="{% url 'reservation_list' %}">Clear filters</a></form>
 <div class="table-scroll"><table>
-<thead><tr><th>Equipment</th><th>Start</th><th>End</th><th>Purpose</th><th>Status</th></tr></thead>
+<thead><tr><th>Equipment</th><th>Start</th><th>End</th><th>Purpose</th><th>Status</th><th>Action</th></tr></thead>
 <tbody>{% for item in page %}<tr>
 <td>{{ item.equipment }}</td><td>{{ item.starts_at|date:"Y-m-d H:i" }}</td><td>{{ item.ends_at|date:"Y-m-d H:i" }}</td><td>{{ item.purpose }}</td><td>{{ item.status }}</td>
-</tr>{% empty %}<tr><td colspan="5">No reservations found.</td></tr>{% endfor %}</tbody>
+<td>{% if item.can_cancel %}<form method="post" action="{% url 'reservation_cancel' item.id %}">{% csrf_token %}<button type="submit">Cancel</button></form>{% endif %}</td>
+</tr>{% empty %}<tr><td colspan="6">No reservations found.</td></tr>{% endfor %}</tbody>
 </table></div>
 {% include "booking/pagination.html" %}
 {% endblock %}

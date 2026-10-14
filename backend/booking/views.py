@@ -4,11 +4,11 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
-from django.views.decorators.http import require_GET, require_http_methods
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from .db import one, query
 from .forms import EquipmentFilter, LaboratoryFilter, ReservationFilter, ReservationForm
-from .services import create_reservation
+from .services import cancel_reservation, create_reservation
 
 
 def page_context(request, rows):
@@ -95,4 +95,17 @@ def reservation_list(request):
                         WHERE r.owner_id = %s AND (%s = '' OR r.status = %s) AND e.name ILIKE %s
                         ORDER BY r.starts_at DESC, r.id DESC""",
                      [request.user.pk, data["status"], data["status"], f"%{data['q']}%"])
+    for row in rows:
+        row["can_cancel"] = row["status"] in ("pending", "approved") and row["starts_at"] > timezone.now()
     return render(request, "booking/reservation_list.html", {"form": form, **page_context(request, rows)})
+
+
+@never_cache
+@login_required
+@require_POST
+def reservation_cancel(request, pk):
+    try:
+        cancel_reservation(request.user, pk)
+    except ValidationError as error:
+        return render(request, "booking/action_error.html", {"error": " ".join(error.messages)}, status=400)
+    return redirect("reservation_list")

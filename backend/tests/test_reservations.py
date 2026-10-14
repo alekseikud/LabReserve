@@ -6,7 +6,7 @@ from django.test import Client, TestCase
 from django.utils import timezone
 
 from booking.db import query
-from booking.services import create_reservation
+from booking.services import cancel_reservation, create_reservation
 from .booking_fixtures import fixtures
 
 
@@ -68,3 +68,27 @@ class ReservationTests(TestCase):
         self.assertEqual(client.post(url, self.data).status_code, 403)
         self.client.logout()
         self.assertEqual(self.client.post(url, self.data).status_code, 302)
+
+    def test_cancellation_keeps_history_and_releases_slot(self):
+        row = create_reservation(self.users["student"], self.equipment["id"], self.data)
+        url = f"/workspace/reservations/{row['id']}/cancel/"
+        self.assertEqual(self.client.get(url).status_code, 405)
+        self.assertRedirects(self.client.post(url), "/workspace/reservations/")
+        self.assertEqual(query("SELECT status FROM reservations_reservation WHERE id = %s", [row["id"]])[0]["status"], "cancelled")
+        create_reservation(self.users["student"], self.equipment["id"], self.data)
+        self.assertEqual(len(query("SELECT id FROM reservations_reservation")), 2)
+        self.assertEqual(self.client.post(url).status_code, 400)
+
+    def test_cannot_cancel_another_users_booking_or_started_booking(self):
+        row = create_reservation(self.users["student"], self.equipment["id"], self.data)
+        self.client.force_login(self.users["manager"])
+        self.assertEqual(self.client.post(f"/workspace/reservations/{row['id']}/cancel/").status_code, 403)
+        query("UPDATE reservations_reservation SET starts_at = %s WHERE id = %s", [timezone.now() - timedelta(hours=1), row["id"]])
+        with self.assertRaises(ValidationError):
+            cancel_reservation(self.users["student"], row["id"])
+
+    def test_cancellation_requires_csrf(self):
+        row = create_reservation(self.users["student"], self.equipment["id"], self.data)
+        client = Client(enforce_csrf_checks=True)
+        client.force_login(self.users["student"])
+        self.assertEqual(client.post(f"/workspace/reservations/{row['id']}/cancel/").status_code, 403)
